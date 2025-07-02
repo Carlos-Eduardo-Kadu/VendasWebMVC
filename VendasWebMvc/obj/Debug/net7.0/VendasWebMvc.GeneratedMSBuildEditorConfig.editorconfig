@@ -16,6 +16,26 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = D:\Estudo de lógica - c#\PDF's\C#POO\Asp.Net Core MVC e Entity Framework\VendasWebMvc\VendasWebMvc
 build_property._RazorSourceGeneratorDebug = 
 
+[D:/Estudo de lógica - c\#/PDF's/C\#POO/Asp.Net Core MVC e Entity Framework/VendasWebMvc/VendasWebMvc/Views/Departments/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVwYXJ0bWVudHNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Estudo de lógica - c\#/PDF's/C\#POO/Asp.Net Core MVC e Entity Framework/VendasWebMvc/VendasWebMvc/Views/Departments/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVwYXJ0bWVudHNcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Estudo de lógica - c\#/PDF's/C\#POO/Asp.Net Core MVC e Entity Framework/VendasWebMvc/VendasWebMvc/Views/Departments/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVwYXJ0bWVudHNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Estudo de lógica - c\#/PDF's/C\#POO/Asp.Net Core MVC e Entity Framework/VendasWebMvc/VendasWebMvc/Views/Departments/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVwYXJ0bWVudHNcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Estudo de lógica - c\#/PDF's/C\#POO/Asp.Net Core MVC e Entity Framework/VendasWebMvc/VendasWebMvc/Views/Departments/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVwYXJ0bWVudHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Estudo de lógica - c\#/PDF's/C\#POO/Asp.Net Core MVC e Entity Framework/VendasWebMvc/VendasWebMvc/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
