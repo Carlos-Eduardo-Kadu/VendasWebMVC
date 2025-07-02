@@ -1,9 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using System.Configuration;
 using VendasWebMvc.Data;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<VendasWebMvcContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("VendasWebMvcContext") ?? throw new InvalidOperationException("Connection string 'VendasWebMvcContext' not found.")));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("VendasWebMvcContext"),
+        ServerVersion.Create(8, 0, 34, ServerType.MySql),
+        mySqlOptions => mySqlOptions.MigrationsAssembly("VendasWebMvc")
+    )
+);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
