@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System.Configuration;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using VendasWebMvc.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Configura o DbContext com Pomelo MySQL
 builder.Services.AddDbContext<VendasWebMvcContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("VendasWebMvcContext"),
@@ -12,17 +15,28 @@ builder.Services.AddDbContext<VendasWebMvcContext>(options =>
     )
 );
 
-// Add services to the container.
+// Injeta o serviço de seeding
+builder.Services.AddScoped<SeedingService>();
+
+// Adiciona serviços MVC
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuração do pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseHsts(); // Segurança: HTTP Strict Transport Security
+}
+else
+{
+    // Executa o seeding apenas no ambiente de desenvolvimento
+    using (var scope = app.Services.CreateScope())
+    {
+        var seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
+        seedingService.Seed();
+    }
 }
 
 app.UseHttpsRedirection();
