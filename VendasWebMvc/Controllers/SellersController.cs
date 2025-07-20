@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using VendasWebMvc.Services;
 
 namespace VendasWebMvc.Controllers
 {
@@ -6,7 +7,15 @@ namespace VendasWebMvc.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var list = _sellerService.FindAll();
+            return View(list);
         }
+
+        private readonly SellerService _sellerService;
+        public SellersController(SellerService sellerService)
+        {
+            _sellerService = sellerService;
+        }
+
     }
 }

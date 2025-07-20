@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using VendasWebMvc.Data;
+using VendasWebMvc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,10 +14,14 @@ builder.Services.AddDbContext<VendasWebMvcContext>(options =>
         ServerVersion.Create(8, 0, 34, ServerType.MySql),
         mySqlOptions => mySqlOptions.MigrationsAssembly("VendasWebMvc")
     )
+
 );
 
 // Injeta o serviço de seeding
 builder.Services.AddScoped<SeedingService>();
+
+// injeta o serviço Services
+builder.Services.AddScoped<SellerService>();
 
 // Adiciona serviços MVC
 builder.Services.AddControllersWithViews();
