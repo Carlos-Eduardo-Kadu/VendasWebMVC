@@ -26,6 +26,11 @@ builder.Services.AddScoped<SellerService>();
 // Adiciona serviços MVC
 builder.Services.AddControllersWithViews();
 
+//injeta o serviço DepartmentService
+builder.Services.AddScoped<DepartmentService>();
+
+
+
 var app = builder.Build();
 
 // Configuração do pipeline HTTP
