@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using VendasWebMvc.Models;
 using VendasWebMvc.Services;
 
 namespace VendasWebMvc.Controllers
@@ -16,6 +17,21 @@ namespace VendasWebMvc.Controllers
         {
             _sellerService = sellerService;
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Seller seller)
+        {
+            
+            await _sellerService.InsertAsync(seller);
+            return RedirectToAction(nameof(Index));
+        }
+
 
     }
 }

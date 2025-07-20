@@ -24,5 +24,10 @@ namespace VendasWebMvc.Models
         {
             return Sellers.Sum(seller => seller.TotalSales(initial, final));
         }
+
+        public static implicit operator Department(int v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
