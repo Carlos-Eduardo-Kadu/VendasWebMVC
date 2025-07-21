@@ -4,41 +4,39 @@ using VendasWebMvc.Models;
 using VendasWebMvc.Models.ViewModels;
 using VendasWebMvc.Services;
 using VendasWebMvc.Services.Exceptions;
+using System.Diagnostics;
+using Azure.Core;
 
 namespace VendasWebMvc.Controllers
 {
     public class SellersController : Controller
     {
-        public IActionResult Index()
-        {
-            var list = _sellerService.FindAll();
-            return View(list);
-        }
-
         private readonly SellerService _sellerService;
         private readonly DepartmentService _departmentService;
+
         public SellersController(SellerService sellerService, DepartmentService departmentService)
         {
             _sellerService = sellerService;
             _departmentService = departmentService;
         }
 
+        public IActionResult Index()
+        {
+            var list = _sellerService.FindAll();
+            return View(list);
+        }
+
         public IActionResult Create()
         {
             var departments = _departmentService.FindAll();
-            var viewModel = new SellerFormViewModel
-            {
-                Departments = departments
-            };
+            var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);
-
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Seller seller)
         {
-
             await _sellerService.InsertAsync(seller);
             return RedirectToAction(nameof(Index));
         }
@@ -47,16 +45,15 @@ namespace VendasWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
             var obj = _sellerService.FindById(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
             return View(obj);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -70,12 +67,12 @@ namespace VendasWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
             var obj = _sellerService.FindById(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
             return View(obj);
         }
@@ -84,15 +81,13 @@ namespace VendasWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
-
             var obj = _sellerService.FindById(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
-
             List<Department> departments = _departmentService.FindAll();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
             return View(viewModel);
@@ -113,13 +108,23 @@ namespace VendasWebMvc.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
             catch (DbConcurrencyException)
             {
                 return BadRequest();
             }
         }
+
+        // Método Error corrigido (estava dentro do Edit)
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel
+            {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+            return View(viewModel);
+        }
     }
 }
-    
