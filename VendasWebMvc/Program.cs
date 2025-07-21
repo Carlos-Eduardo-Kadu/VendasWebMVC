@@ -4,6 +4,8 @@ using System.Configuration;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using VendasWebMvc.Data;
 using VendasWebMvc.Services;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<VendasWebMvcContext>(options =>
     )
 
 );
+
 
 // Injeta o serviço de seeding
 builder.Services.AddScoped<SeedingService>();
@@ -61,3 +64,13 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+var enUS = new CultureInfo("en-US");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(enUS),
+    SupportedCultures = new List<CultureInfo> { enUS },
+    SupportedUICultures = new List<CultureInfo> { enUS }
+};
+
+app.UseRequestLocalization(localizationOptions);

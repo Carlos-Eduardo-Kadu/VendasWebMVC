@@ -11,8 +11,8 @@ using VendasWebMvc.Data;
 namespace VendasWebMvc.Migrations
 {
     [DbContext(typeof(VendasWebMvcContext))]
-    [Migration("20250707153524_OtherEntities")]
-    partial class OtherEntities
+    [Migration("20250721203716_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,9 @@ namespace VendasWebMvc.Migrations
                     b.Property<double>("BaseSalary")
                         .HasColumnType("double");
 
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
@@ -81,9 +84,6 @@ namespace VendasWebMvc.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 

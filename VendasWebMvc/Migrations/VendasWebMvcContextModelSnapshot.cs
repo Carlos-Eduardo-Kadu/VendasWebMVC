@@ -68,6 +68,9 @@ namespace VendasWebMvc.Migrations
                     b.Property<double>("BaseSalary")
                         .HasColumnType("double");
 
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
@@ -78,9 +81,6 @@ namespace VendasWebMvc.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime>("birthDtae")
-                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
