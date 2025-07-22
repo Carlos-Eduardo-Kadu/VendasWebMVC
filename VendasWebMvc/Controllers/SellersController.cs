@@ -7,6 +7,7 @@ using VendasWebMvc.Services;            // Serviços de aplicação
 using VendasWebMvc.Services.Exceptions; // Exceções personalizadas
 using System.Diagnostics;               // Para Activity (log de erros)
 using Azure.Core;                       // Possivelmente para integração com Azure
+using NuGet.Protocol.Plugins;
 
 namespace VendasWebMvc.Controllers
 {
@@ -47,6 +48,12 @@ namespace VendasWebMvc.Controllers
         [ValidateAntiForgeryToken]  // Proteção contra CSRF
         public async Task<IActionResult> Create(Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                var departments = _departmentService.FindAll();
+                var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
+            }
             await _sellerService.InsertAsync(seller);  // Insere assincronamente
             return RedirectToAction(nameof(Index));    // Redireciona para a lista
         }
@@ -97,8 +104,14 @@ namespace VendasWebMvc.Controllers
 
         // GET: Sellers/Edit/5
         // Mostra formulário de edição
-        public IActionResult Edit(int? id)
+        public IActionResult Edit(int? id, Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                var departmenTs = _departmentService.FindAll();
+                var viewModeL = new SellerFormViewModel { Seller = seller, Departments = departmenTs };
+                return View(viewModeL);
+            }
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
