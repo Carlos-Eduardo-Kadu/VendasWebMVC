@@ -7,164 +7,147 @@ using VendasWebMvc.Services;            // Serviços de aplicação
 using VendasWebMvc.Services.Exceptions; // Exceções personalizadas
 using System.Diagnostics;               // Para Activity (log de erros)
 using Azure.Core;                       // Possivelmente para integração com Azure
-using NuGet.Protocol.Plugins;
+using SalesWebMvc.Services.Exceptions;
 
 namespace VendasWebMvc.Controllers
 {
     public class SellersController : Controller
     {
-        // Injeção de dependência dos serviços
         private readonly SellerService _sellerService;
         private readonly DepartmentService _departmentService;
 
-        // Construtor com injeção de dependência
         public SellersController(SellerService sellerService, DepartmentService departmentService)
         {
             _sellerService = sellerService;
             _departmentService = departmentService;
         }
 
-        // GET: Sellers
-        // Lista todos os vendedores
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var list = _sellerService.FindAll();
+            var list = await _sellerService.FindAllAsync();
             return View(list);
         }
 
-        // GET: Sellers/Create
-        // Mostra o formulário de criação de vendedor
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            // Carrega os departamentos para o dropdown
-            var departments = _departmentService.FindAll();
+            var departments = await _departmentService.FindAllAsync();
             var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);
         }
 
-        // POST: Sellers/Create
-        // Processa o formulário de criação
         [HttpPost]
-        [ValidateAntiForgeryToken]  // Proteção contra CSRF
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Seller seller)
         {
             if (!ModelState.IsValid)
             {
-                var departments = _departmentService.FindAll();
+                var departments = await _departmentService.FindAllAsync();
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(viewModel);
             }
-            await _sellerService.InsertAsync(seller);  // Insere assincronamente
-            return RedirectToAction(nameof(Index));    // Redireciona para a lista
+            await _sellerService.InsertAsync(seller);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Sellers/Delete/5
-        // Mostra tela de confirmação de exclusão
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)  // Verifica se ID foi fornecido
+            if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
-            var obj = _sellerService.FindById(id.Value);
-            if (obj == null)  // Verifica se existe o vendedor
+            var obj = await _sellerService.FindByIdAsync(id.Value);
+            if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
+
             return View(obj);
         }
 
-        // POST: Sellers/Delete/5
-        // Processa a exclusão
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            _sellerService.Remove(id);
-            return RedirectToAction(nameof(Index));  // Redireciona para a lista
+            try
+            {
+                await _sellerService.RemoveAsync(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (IntegrityException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }
         }
 
-        // GET: Sellers/Details/5
-        // Mostra detalhes do vendedor
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
+
             return View(obj);
         }
 
-        // GET: Sellers/Edit/5
-        // Mostra formulário de edição
-        public IActionResult Edit(int? id, Seller seller)
+        public async Task<IActionResult> Edit(int? id)
         {
-            if (!ModelState.IsValid)
-            {
-                var departmenTs = _departmentService.FindAll();
-                var viewModeL = new SellerFormViewModel { Seller = seller, Departments = departmenTs };
-                return View(viewModeL);
-            }
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
-            // Carrega departamentos para o dropdown
-            List<Department> departments = _departmentService.FindAll();
+            List<Department> departments = (List<Department>)await _departmentService.FindAllAsync();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
             return View(viewModel);
         }
 
-        // POST: Sellers/Edit/5
-        // Processa o formulário de edição
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Seller seller)
+        public async Task<IActionResult> Edit(int id, Seller seller)
         {
-            if (id != seller.Id)  // Verifica consistência do ID
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                var departments = await _departmentService.FindAllAsync();
+                var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
             }
-
+            if (id != seller.Id)
+            {
+                return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
+            }
             try
             {
-                _sellerService.Update(seller);
+                await _sellerService.UpdateAsync(seller);
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundException)  // Se o vendedor não existir
+            catch (ApplicationException e)
             {
-                return RedirectToAction(nameof(Error), new { message = "Id not found" });
-            }
-            catch (DbConcurrencyException)  // Se houve conflito de concorrência
-            {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
         }
 
-        // Tratamento de erros genérico
         public IActionResult Error(string message)
         {
             var viewModel = new ErrorViewModel
             {
                 Message = message,
-                // Identificador único para rastreamento do erro
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             };
             return View(viewModel);
         }
     }
 }
+

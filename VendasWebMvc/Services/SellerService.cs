@@ -1,67 +1,70 @@
-﻿using VendasWebMvc.Data;
+﻿using VendasWebMvc.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using VendasWebMvc.Services.Exceptions;
 using VendasWebMvc.Models;
 using VendasWebMvc.Services.Exceptions;
-using Microsoft.EntityFrameworkCore;
+using VendasWebMvc.Data;
+using SalesWebMvc.Services.Exceptions;
 
 namespace VendasWebMvc.Services
 {
     public class SellerService
     {
-        // Contexto do banco de dados (Entity Framework Core)
         private readonly VendasWebMvcContext _context;
 
-        // Construtor com injeção de dependência do contexto
         public SellerService(VendasWebMvcContext context)
         {
             _context = context;
         }
 
-        // Retorna todos os vendedores do banco (síncrono)
-        public List<Seller> FindAll()
+        public async Task<List<Seller>> FindAllAsync()
         {
-            return _context.Seller.ToList();
+            return await _context.Seller.ToListAsync();
         }
 
-        // Insere um novo vendedor no banco (assíncrono)
         public async Task InsertAsync(Seller obj)
         {
-            _context.Add(obj); // Adiciona ao contexto
-            await _context.SaveChangesAsync(); // Persiste no banco
+            _context.Add(obj);
+            await _context.SaveChangesAsync();
         }
 
-        // Busca um vendedor por ID incluindo seu departamento (síncrono)
-        public Seller FindById(int id)
+        public async Task<Seller> FindByIdAsync(int id)
         {
-            // Usa Include para carregar o relacionamento Department (eager loading)
-            return _context.Seller
-                .Include(obj => obj.Department)
-                .FirstOrDefault(obj => obj.Id == id);
+            return await _context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
         }
 
-        // Remove um vendedor do banco (síncrono)
-        public void Remove(int id)
+        public async Task RemoveAsync(int id)
         {
-            var obj = _context.Seller.Find(id); // Localiza o vendedor
-            _context.Seller.Remove(obj); // Marca para remoção
-            _context.SaveChanges(); // Executa a remoção
+            try
+            {
+                var obj = await _context.Seller.FindAsync(id);
+                _context.Seller.Remove(obj);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                throw new IntegrityException("Can't delete seller because he/she has sales");
+            }
         }
 
-        // Atualiza um vendedor existente (síncrono)
-        public void Update(Seller obj)
+        public async Task UpdateAsync(Seller obj)
         {
-            // Verifica se o vendedor existe no banco
-            if (!_context.Seller.Any(x => x.Id == obj.Id))
+            bool hasAny = await _context.Seller.AnyAsync(x => x.Id == obj.Id);
+            if (!hasAny)
             {
                 throw new NotFoundException("Id not found");
             }
             try
             {
-                _context.Update(obj); // Marca como modificado
-                _context.SaveChanges(); // Persiste as alterações
+                _context.Update(obj);
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException e)
             {
-                // Converte a exceção do EF para uma exceção da camada de serviço
                 throw new DbConcurrencyException(e.Message);
             }
         }
